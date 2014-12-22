@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
+    <style>
+        #canvas canvas{
+            border: solid red 1px;
+        }
+    </style>
 </head>
 <body>
-<div class="canvas"></div>
+<div>
+    selfId : <span id="selfId"></span>
+    otherId : <span id="otherId"><input type="text"/></span>
+    <button id="connOther">connect</button>
+</div>
+<div id="canvas"></div>
 <script src="./assets/libs/jquery/1.11.2/jquery.js"></script>
 <script src="./assets/libs/lodash.js/2.4.1/lodash.js"></script>
 <script src="/socket.io/socket.io.js"></script>

@@ -25,7 +25,11 @@ io.on('connection', function (socket) {
     });
 
     socket.on('board', function (name, data){
-        socket.broadcast.emit('board', name, data);
+        socket.broadcast.to(name).emit('board', data);
+    });
+
+    socket.on('setOtherId', function(data){
+        socket.broadcast.to(data.otherId).emit('setOtherId', data.selfId);
     });
 
     socket.on('getSocketId', function(data){
