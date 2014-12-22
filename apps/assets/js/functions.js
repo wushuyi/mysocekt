@@ -143,10 +143,22 @@
 			penOnUp(point);
 		});
 
+		var remoteBuff = [];
+		var remoteLock = false;
 		socket.on('board', function (data) {
-			if (data.length) {
+			remoteBuff.push(data);
+			if(!remoteLock){
+				drawRemote();
+			}
+		});
+
+		function drawRemote(){
+			if (remoteBuff.length) {
+				remoteLock = true;
+				var data = remoteBuff[0];
 				var fpsBuff = [];
 				var looprun;
+				var testlock = false;
 
 				var loopPush = function () {
 					fpsBuff = data[0];
@@ -159,16 +171,27 @@
 								penOnMove(data, true);
 								break;
 							case 3:
+								testlock = true;
 								penOnUp(data, true);
 								break;
 						}
 					});
+					!testlock ? ctx.stroke() : testlock = false;
 					data = _.rest(data);
+					if(data.length === 0){
+						remoteBuff = _.rest(remoteBuff);
+						data = remoteBuff[0];
+						if(!data){
+							window.cancelAnimationFrame(loopPush);
+							remoteLock = false;
+							return false;
+						}
+					}
 					looprun = window.requestAnimationFrame(loopPush);
 				};
 				looprun = window.requestAnimationFrame(loopPush);
 			}
-		});
+		}
 
 		var moveBuff = [];
 		var fpsBuff= [];
@@ -176,7 +199,7 @@
 		var looprun;
 
 		var loopPush = function(){
-			//ctx.stroke();
+			ctx.stroke();
 			moveBuff.push(fpsBuff);
 			fpsBuff = [];
 			looprun = window.requestAnimationFrame(loopPush);
@@ -206,14 +229,17 @@
 				return false;
 			}
 			ctx.lineTo(point.x, point.y);
-			ctx.stroke();
-
 			if(!isRemote){
 				point.m = 2;
 				fpsBuff.push(point);
 				if(!moveLock){
 					moveLock = true;
 					looprun = window.requestAnimationFrame(loopPush);
+				}
+				console.log();
+				if(moveBuff.length == 30){
+					socket.emit('board', moveBuff);
+					moveBuff = [];
 				}
 			}
 		}
