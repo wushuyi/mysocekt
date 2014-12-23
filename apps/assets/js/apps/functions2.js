@@ -23,9 +23,9 @@
 
 
     $(document).ready(function ($) {
-        $(document).on("selectstart", "canvas", function () {
-            return false;
-        });
+        //$(document).on("selectstart", "canvas", function () {
+        //    return false;
+        //});
         initSocket();
     });
 
@@ -78,7 +78,7 @@
         var canvas = canvasBuff.canvas;
         var ctx = canvasBuff.context;
         $('#canvas').append(canvas);
-        var $canvas = $(canvas);
+        var $canvas = $('canvas');
         $canvas.on('contextmenu', function (ev) {
             ev.preventDefault();
         });
@@ -166,6 +166,10 @@
             ctx.stroke();
             moveBuff.push(fpsBuff);
             fpsBuff = [];
+            if (moveBuff.length == 30) {
+                socket.emit('board', gData.otherId, moveBuff);
+                moveBuff = [];
+            }
             looprun = window.requestAnimationFrame(loopPush);
         };
 
@@ -199,11 +203,6 @@
                 if (!moveLock) {
                     moveLock = true;
                     looprun = window.requestAnimationFrame(loopPush);
-                }
-                console.log();
-                if (moveBuff.length == 30) {
-                    socket.emit('board', gData.otherId, moveBuff);
-                    moveBuff = [];
                 }
             }
         }
