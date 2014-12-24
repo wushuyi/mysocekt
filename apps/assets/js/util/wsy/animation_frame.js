@@ -1,7 +1,10 @@
 /**
  * Created by shuyi.wu on 2014/12/23.
  */
+/* global WSY, clearTimeout */
 (function (plugin, window) {
+    'use strict';
+
     var factory = function(WSY){
         return plugin(WSY, window);
     };
@@ -16,6 +19,8 @@
         factory(WSY);
     }
 }(function(WSY,window,undefined){
+    'use strict';
+
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
     for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {

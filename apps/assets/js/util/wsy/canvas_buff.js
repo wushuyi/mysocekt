@@ -1,4 +1,10 @@
+/**
+ * Created by shuyi.wu on 2014/12/23.
+ */
+/* global WSY */
 (function (plugin, window) {
+    'use strict';
+
     var factory = function(WSY){
         return plugin(WSY, window);
     };
@@ -13,11 +19,13 @@
         factory(WSY);
     }
 }(function(WSY,window,undefined){
+    'use strict';
+
     WSY.CanvasBuffer = function (width, height) {
         this.width = width;
         this.height = height;
-        this.canvas = document.createElement("canvas");
-        this.context = this.canvas.getContext("2d");
+        this.canvas = document.createElement('canvas');
+        this.context = this.canvas.getContext('2d');
         this.canvas.width = width;
         this.canvas.height = height;
     };
