@@ -16,7 +16,10 @@ define([
     ) {
         'use strict';
 
-        WSY.CanvasBoard = function(){
+        WSY.CanvasBoard = function(options){
+            if(!options || typeof options !== 'object'){
+                throw 'error options';
+            }
             this._env = {
                 local: {
                     moveBuff: [],
@@ -34,7 +37,7 @@ define([
                 ctxSave: {}
             };
             this._boardCtl = {};
-            this._canvas = new WSY.CanvasBuffer(800, 600);
+            this._canvas = new WSY.CanvasBuffer(options.width, options.height);
         };
 
         WSY.CanvasBoard.prototype._sendBoardData = function(data){
@@ -249,6 +252,11 @@ define([
                 img = null;
             };
             img.src = saveCanvas;
+        };
+
+        WSY.CanvasBoard.prototype.isRemoteDraw = function(){
+            var self = this;
+            return self._env.remote.moveLock;
         };
     }
 );

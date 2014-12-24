@@ -21,7 +21,10 @@ define([
     var initBoard, gData = {}, myBoard, socket;
 
     initBoard = function($el, socket){
-        var myBoard = new WSY.CanvasBoard();
+        var myBoard = new WSY.CanvasBoard({
+            width: 800,
+            height: 600
+        });
         var $canvas = $(myBoard._canvas.canvas);
         window.myBoard = myBoard;
         $el.append($canvas);
@@ -36,16 +39,25 @@ define([
             if (e.originalEvent.button === 2) {
                 return false;
             }
+            if(myBoard.isRemoteDraw()){
+                return false;
+            }
             var point = getOffsetPoint.getPoint(e);
             myBoard.penOnDown(point);
         });
         $canvas.on('mousemove touchmove', function (e) {
             e.preventDefault();
+            if(myBoard.isRemoteDraw()){
+                return false;
+            }
             var point = getOffsetPoint.getPoint(e);
             myBoard.penOnMove(point);
         });
         $canvas.on('mouseup mouseleave touchend', function (e) {
             e.preventDefault();
+            if(myBoard.isRemoteDraw()){
+                return false;
+            }
             var point = getOffsetPoint.getPoint(e);
             myBoard.penOnUp(point);
         });
