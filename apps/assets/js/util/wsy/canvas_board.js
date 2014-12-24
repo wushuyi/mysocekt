@@ -2,7 +2,6 @@
  * Created by shuyi.wu on 2014/12/24.
  */
 define([
-        'jquery',
         'lodash',
         'WSY',
 
@@ -10,7 +9,6 @@ define([
         'wsy/animation_frame'
     ],
     function (
-        $,
         _,
         WSY
     ) {
@@ -54,11 +52,11 @@ define([
             var remote = self._env.remote;
             remote.moveBuff.push(data);
             if(!remote.moveLock){
-                self.penRemoteDraw.call(self);
+                self.remoteDraw.call(self);
             }
         };
 
-        WSY.CanvasBoard.prototype.penRemoteDraw = function(){
+        WSY.CanvasBoard.prototype.remoteDraw = function(){
             var self = this;
             var remote = self._env.remote;
             if (remote.moveBuff) {
@@ -66,7 +64,7 @@ define([
                 remote.data = remote.moveBuff[0];
                 remote.fpsBuff = [];
                 remote.looprun = window.requestAnimFrame(function(){
-                    self._penRemoteLoop.call(self);
+                    self._remoteLoop.call(self);
                 });
             }
         };
@@ -75,8 +73,12 @@ define([
             var self = this;
             var local = self._env.local;
             var ctx = self._canvas.context;
+            var boardCtl = self._boardCtl;
 
-            ctx.stroke();
+            if(boardCtl.drawType === 'pen'){
+                ctx.stroke();
+            }
+
             local.moveBuff.push(local.fpsBuff);
             local.fpsBuff = [];
             if (local.moveBuff.length === 30) {
@@ -88,29 +90,38 @@ define([
             });
         };
 
-        WSY.CanvasBoard.prototype._penRemoteLoop = function(){
+        WSY.CanvasBoard.prototype._remoteLoop = function(){
             var self = this;
             var remote = self._env.remote;
             var ctx = self._canvas.context;
-            var needStroke = true;
+
             remote.fpsBuff = remote.data[0];
             _.forEach(remote.fpsBuff, function (data, key) {
                 switch (data.m) {
-                    case 1:
-                        self.penOnDown(data, true);
-                        break;
                     case 2:
                         self.penOnMove(data, true);
+                        ctx.stroke();
+                        break;
+                    case 4:
+                        self.eraserOnMove(data, true);
+                        break;
+                    case 1:
+                        self.penOnDown(data, true);
+                        ctx.stroke();
                         break;
                     case 3:
-                        needStroke = false;
                         self.penOnUp(data, true);
                         break;
+                    case 5:
+                        self.eraserOnDown(data, true);
+                        break;
+                    case 6:
+                        self.eraserOnUp(data, true);
+                        break;
+                    default :
+
                 }
             });
-            if(needStroke){
-                ctx.stroke();
-            }
             remote.data.shift();
             if (!remote.data.length) {
                 remote.moveBuff.shift();
@@ -122,7 +133,7 @@ define([
                 }
             }
             remote.looprun = window.requestAnimFrame(function(){
-                self._penRemoteLoop.call(self);
+                self._remoteLoop.call(self);
             });
         };
 
@@ -186,6 +197,71 @@ define([
             ctx.closePath();
             if (!isRemote) {
                 point.m = 3;
+                local.moveBuff.push([
+                    point
+                ]);
+                self._sendBoardData.call(self, local.moveBuff);
+                local.moveBuff = [];
+            }
+        };
+
+        WSY.CanvasBoard.prototype.eraserOnDown = function(point, isRemote){
+            var self = this;
+            var local = self._env.local;
+            var ctx = self._canvas.context;
+            var boardCtl = self._boardCtl;
+
+            boardCtl.isDown = true;
+            boardCtl.drawType = 'eraser';
+            ctx.clearRect(point.x, point.y - 30, 30, 30);
+            if(!isRemote){
+                point.m = 4;
+                local.moveBuff.push([
+                    point
+                ]);
+            }
+        };
+
+        WSY.CanvasBoard.prototype.eraserOnMove = function(point, isRemote){
+            var self = this;
+            var local = self._env.local;
+            var ctx = self._canvas.context;
+            var boardCtl = self._boardCtl;
+            var drawLoopPush = self._drawLoopPush;
+
+            if(!boardCtl.isDown || boardCtl.drawType !== 'eraser'){
+                return false;
+            }
+            boardCtl.drawType = 'eraser';
+            ctx.clearRect(point.x, point.y - 30, 30, 30);
+
+            if(!isRemote){
+                point.m = 5;
+                local.fpsBuff.push(point);
+                if (!local.moveLock) {
+                    local.moveLock = true;
+                    local.looprun = window.requestAnimFrame(function(){
+                        drawLoopPush.call(self);
+                    });
+                }
+            }
+        };
+
+        WSY.CanvasBoard.prototype.eraserOnUp = function(point, isRemote){
+            var self = this;
+            var local = self._env.local;
+            var boardCtl = self._boardCtl;
+
+            if(!boardCtl.isDown || boardCtl.drawType !== 'eraser'){
+                return false;
+            }
+            window.cancelAnimationFrame(local.looprun);
+            local.fpsBuff = [];
+            local.moveLock = false;
+            boardCtl.isDown = false;
+            boardCtl.drawType = null;
+            if(!isRemote){
+                point.m = 6;
                 local.moveBuff.push([
                     point
                 ]);

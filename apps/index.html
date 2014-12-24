@@ -7,6 +7,9 @@
         #canvas canvas{
             border: solid red 1px;
         }
+        #toolsBar{
+            display: none;
+        }
     </style>
     <!--<script src="/socket.io/socket.io.js"></script>-->
     <script data-main="assets/js/app.js" src="assets/libs/require.js/2.1.15/require.js"></script>
@@ -18,6 +21,11 @@
     <button id="connOther">connect</button>
 </div>
 <div id="canvas"></div>
-
+<div id="toolsBar">
+    <button id="pen">pen</button>
+    <button id="penRed">penRed</button>
+    <button id="penBlack">penBlack</button>
+    <button id="eraser">eraser</button>
+</div>
 </body>
 </html>

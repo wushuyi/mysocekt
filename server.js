@@ -5,14 +5,14 @@ var io = require('socket.io')(server);
 
 server.listen(3000);
 
-app.all("*", function(req, res, next){
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Power-By", "wushuyi");
-    res.removeHeader("X-Powered-By");
+app.all('*', function(req, res, next){
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Power-By', 'wushuyi');
+    res.removeHeader('X-Powered-By');
     next();
 });
 
-app.use(express.static(__dirname + "/apps"));
+app.use(express.static(__dirname + '/apps'));
 
 io.on('connection', function (socket) {
     socket.on('joinRoom', function(data){
@@ -26,6 +26,10 @@ io.on('connection', function (socket) {
 
     socket.on('board', function (name, data){
         socket.broadcast.to(name).emit('board', data);
+    });
+
+    socket.on('boardCtl', function (name, data){
+        socket.broadcast.to(name).emit('boardCtl', data);
     });
 
     socket.on('setOtherId', function(data){
