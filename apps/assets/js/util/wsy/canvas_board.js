@@ -30,7 +30,8 @@ define([
                     moveLock: false,
                     looprun: null,
                     data: null
-                }
+                },
+                ctxSave: {}
             };
             this._boardCtl = {};
             this._canvas = new WSY.CanvasBuffer(800, 600);
@@ -190,5 +191,64 @@ define([
             }
         };
 
+        WSY.CanvasBoard.prototype.saveStyle = function(){
+            var self = this;
+            var ctx = self._canvas.context;
+            var ctxSave = self._env.ctxSave;
+            var testValue = '[object HTMLCanvasElement]';
+            for (var key in ctx) {
+                if (ctx.hasOwnProperty(key)) {
+                    var value = ctx[key];
+                    if (value.toString() !== testValue) {
+                        ctxSave[key] = value;
+                    }
+                }
+            }
+        };
+
+        WSY.CanvasBoard.prototype.restoreStyle = function(){
+            var self = this;
+            var ctx = self._canvas.context;
+            var ctxSave = self._env.ctxSave;
+            for (var key in ctxSave) {
+                if (ctx.hasOwnProperty(key)) {
+                    ctx[key] = ctxSave[key];
+                }
+            }
+        };
+
+        WSY.CanvasBoard.prototype.setStyle = function(key, value){
+            if(!key || !value){
+                throw 'error arguments';
+            }
+            var self = this;
+            var ctx = self._canvas.context;
+            ctx[key] = value;
+        };
+
+        WSY.CanvasBoard.prototype.resize = function(options){
+            if(!options || typeof options !== 'object'){
+                throw 'error options';
+            }
+            var self = this;
+            var canvas = self._canvas.canvas;
+            var ctx = self._canvas.context;
+
+            var saveCanvas = canvas.toDataURL();
+            self.saveStyle.call(self);
+            if(options.width){
+                canvas.width = options.width;
+            }
+            if(options.height){
+                canvas.height = options.height;
+            }
+            self.restoreStyle.call(self);
+            var img = new Image();
+            img.onload = function(){
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                img = null;
+            };
+            img.src = saveCanvas;
+        };
     }
 );

@@ -19,10 +19,11 @@ define([
 ){
     'use strict';
     var initBoard, gData = {}, myBoard, socket;
+
     initBoard = function($el, socket){
         var myBoard = new WSY.CanvasBoard();
         var $canvas = $(myBoard._canvas.canvas);
-
+        window.myBoard = myBoard;
         $el.append($canvas);
         var parentOffset = $canvas.offset();
         var getOffsetPoint = new WSY.getOffsetPoint(parentOffset);
