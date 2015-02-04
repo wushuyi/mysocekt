@@ -5,19 +5,57 @@ define([
     'domReady',
     'jquery',
     'lodash',
+    'localforage',
     'socketio',
     'WSY',
 
-    'wsy/canvas_board',
+    'wsy/hf_canvas_board',
     'wsy/get_offset_point'
 ],function(
     domReady,
     $,
     _,
+    localforage,
     io,
     WSY
 ){
     'use strict';
+
+    window.localforage = localforage;
+    localforage.config({
+        driver      : localforage.INDEXEDDB,
+        name        : 'myApp',
+        version     : 1.0,
+        size        : 4980736,
+        storeName   : 'keyvaluepairs',
+        description : 'some description'
+    });
+    //localforage.setItem('key', 'sdafsad').then(function(data) {
+    //    console.log(data + ' was set!');
+    //}, function(error) {
+    //    console.error(error);
+    //});
+    //localforage.getItem('key').then(function(){
+    //    console.log(arguments);
+    //}, function(){
+    //    console.log(arguments);
+    //});
+
+    function setData(key, value, callback){
+        localforage.getItem('test').then(function(data){
+            var optionData = data || {};
+            optionData[key] = value;
+            localforage.setItem('test', optionData).then(function(data){
+                if(callback){
+                    callback(data);
+                }
+               //console.log(arguments);
+            });
+        });
+    }
+    window.setData = setData;
+    setData('name', 'lalala');
+
     var initBoard, gData = {}, myBoard, socket;
 
     initBoard = function($el, socket){
@@ -64,10 +102,11 @@ define([
         });
 
 
-        myBoard = new WSY.CanvasBoard({
+        myBoard = new WSY.hfCanvasBoard({
             width: 800,
             height: 600
         });
+        window.myBoard = myBoard;
         var $canvas = $(myBoard._canvas.canvas);
         window.myBoard = myBoard;
         $el.append($canvas);

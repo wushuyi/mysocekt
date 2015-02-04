@@ -34,6 +34,5 @@ define([
                 y : pageY - parentOffset.top
             };
         };
-
     }
 );
