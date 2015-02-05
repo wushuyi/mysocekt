@@ -182,6 +182,10 @@ define([
 
     domReady(function(){
         socket = io();
+        socket.on('test', function(data){
+            console.log(data);
+        });
+        window.socket = socket;
 
         $('#connOther').on('click', function (ev) {
             gData.otherId = $.trim($('#otherId input').val());

@@ -39,7 +39,7 @@ requirejs.config({
         "jquery": "libs/jquery/2.1.2/jquery",
         "lodash": "libs/lodash.js/2.4.1/lodash",
         "localforage": "libs/localforage/1.2.0/localforage",
-        "socketio": "libs/socket.io/0.9.6/socket.io.min",
+        "socketio": "http://libs.wushuyi.com/socket.io/1.2.1/socket.io",
         "WSY": "js/util/wsy/core"
     },
     "shim": {}

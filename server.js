@@ -43,4 +43,8 @@ io.on('connection', function (socket) {
     socket.on('getSocketRoom', function(data){
         socket.emit('getSocketRoom', socket.rooms);
     });
+
+    socket.on('test', function(name, data){
+        socket.broadcast.to(name).emit('test', data);
+    });
 });
