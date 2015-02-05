@@ -108,7 +108,6 @@ define([
         });
         window.myBoard = myBoard;
         var $canvas = $(myBoard._canvas.canvas);
-        window.myBoard = myBoard;
         $el.append($canvas);
         var parentOffset = $canvas.offset();
         var getOffsetPoint = new WSY.getOffsetPoint(parentOffset);
@@ -130,7 +129,6 @@ define([
             }else if(drawType === 'eraser'){
                 myBoard.eraserOnDown(point);
             }
-
         });
         $canvas.on('mousemove touchmove', function (e) {
             e.preventDefault();
